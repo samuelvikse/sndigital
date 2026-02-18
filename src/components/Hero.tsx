@@ -54,12 +54,14 @@ export default function Hero() {
         </p>
         <div className="flex gap-4 mt-10">
           <button
+            type="button"
             className="px-6 py-3 bg-[#231f20] text-white text-sm font-light tracking-wide rounded-sm hover:bg-[#3a3536] transition-colors animate-text-reveal"
             style={{ animationDelay: "1.4s" } as React.CSSProperties}
           >
             Initialize System Audit &rarr;
           </button>
           <button
+            type="button"
             className="px-6 py-3 text-[#231f20] text-sm font-light tracking-wide border border-[#231f20]/20 rounded-sm hover:border-[#231f20]/50 transition-colors animate-text-reveal"
             style={{ animationDelay: "1.55s" } as React.CSSProperties}
           >

@@ -69,14 +69,16 @@ export default function Testimonials() {
     return () => clearInterval(interval);
   }, [next]);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const lastMove = useRef(0);
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    const now = Date.now();
+    if (now - lastMove.current < 32) return;
+    lastMove.current = now;
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left - rect.width / 2) * 0.08;
-    const y = (e.clientY - rect.top - rect.height / 2) * 0.08;
-    mouseX.set(x);
-    mouseY.set(y);
-  };
+    mouseX.set((e.clientX - rect.left - rect.width / 2) * 0.08);
+    mouseY.set((e.clientY - rect.top - rect.height / 2) * 0.08);
+  }, [mouseX, mouseY]);
 
   const t = testimonials[current];
 
@@ -84,7 +86,7 @@ export default function Testimonials() {
     <section
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative bg-white py-32 px-8 md:px-16 lg:px-24 overflow-hidden min-h-[600px] flex items-center justify-center"
+      className="relative bg-white py-32 pb-48 px-8 md:px-16 lg:px-24 overflow-hidden min-h-[600px] flex items-center justify-center"
     >
       {/* Background number */}
       <motion.span
@@ -154,6 +156,7 @@ export default function Testimonials() {
 
           <div className="flex gap-3">
             <button
+              type="button"
               onClick={prev}
               className="group w-10 h-10 border border-[#231f20]/15 rounded-full flex items-center justify-center relative overflow-hidden hover:border-[#231f20]/40 transition-colors"
             >
@@ -162,6 +165,7 @@ export default function Testimonials() {
               </svg>
             </button>
             <button
+              type="button"
               onClick={next}
               className="group w-10 h-10 border border-[#231f20]/15 rounded-full flex items-center justify-center relative overflow-hidden hover:border-[#231f20]/40 transition-colors"
             >
