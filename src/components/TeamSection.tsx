@@ -11,6 +11,7 @@ const team = [
       "Focused on building lead generation systems and growth strategies that turn outbound into predictable revenue. Obsessed with the details that make the difference between a cold call and a booked meeting.",
     imageUrl: "/samuel.png",
     linkedinUrl: "#",
+    emailUrl: "mailto:samuel@sndigital.eu",
   },
   {
     name: "Niko Oliver Hergge",
@@ -19,6 +20,7 @@ const team = [
       "Specializes in AI automation and optimization, designing intelligent workflows that eliminate busywork and scale what works. Believes every business process can be made smarter.",
     imageUrl: "/office2.png",
     linkedinUrl: "#",
+    emailUrl: "mailto:niko@sndigital.eu",
   },
 ];
 

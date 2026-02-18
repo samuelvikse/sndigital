@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Linkedin, ChevronLeft, ChevronRight } from "lucide-react";
+import { Linkedin, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Profile {
@@ -13,6 +13,7 @@ interface Profile {
   description: string;
   imageUrl: string;
   linkedinUrl?: string;
+  emailUrl?: string;
 }
 
 export interface ProfileCarouselProps {
@@ -83,17 +84,28 @@ export function ProfileCarousel({ profiles, className }: ProfileCarouselProps) {
                 {current.description}
               </p>
 
-              {current.linkedinUrl && (
-                <Link
-                  href={current.linkedinUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-9 h-9 border border-[#231f20]/10 rounded-full flex items-center justify-center transition-colors hover:border-[#231f20]/30"
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin className="w-3.5 h-3.5 text-[#231f20]/40" />
-                </Link>
-              )}
+              <div className="flex gap-3">
+                {current.linkedinUrl && (
+                  <Link
+                    href={current.linkedinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 border border-[#231f20]/10 rounded-full flex items-center justify-center transition-colors hover:border-[#231f20]/30"
+                    aria-label="LinkedIn"
+                  >
+                    <Linkedin className="w-3.5 h-3.5 text-[#231f20]/40" />
+                  </Link>
+                )}
+                {current.emailUrl && (
+                  <Link
+                    href={current.emailUrl}
+                    className="w-9 h-9 border border-[#231f20]/10 rounded-full flex items-center justify-center transition-colors hover:border-[#231f20]/30"
+                    aria-label="Email"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-[#231f20]/40" />
+                  </Link>
+                )}
+              </div>
             </motion.div>
           </AnimatePresence>
         </div>
@@ -141,17 +153,28 @@ export function ProfileCarousel({ profiles, className }: ProfileCarouselProps) {
             <p className="text-sm font-light text-[#231f20]/60 leading-[1.8] mb-6">
               {current.description}
             </p>
-            {current.linkedinUrl && (
-              <Link
-                href={current.linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 border border-[#231f20]/10 rounded-full flex items-center justify-center transition-colors hover:border-[#231f20]/30"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="w-3.5 h-3.5 text-[#231f20]/40" />
-              </Link>
-            )}
+            <div className="flex gap-3">
+              {current.linkedinUrl && (
+                <Link
+                  href={current.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 border border-[#231f20]/10 rounded-full flex items-center justify-center transition-colors hover:border-[#231f20]/30"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin className="w-3.5 h-3.5 text-[#231f20]/40" />
+                </Link>
+              )}
+              {current.emailUrl && (
+                <Link
+                  href={current.emailUrl}
+                  className="w-9 h-9 border border-[#231f20]/10 rounded-full flex items-center justify-center transition-colors hover:border-[#231f20]/30"
+                  aria-label="Email"
+                >
+                  <Mail className="w-3.5 h-3.5 text-[#231f20]/40" />
+                </Link>
+              )}
+            </div>
           </motion.div>
         </AnimatePresence>
       </div>
