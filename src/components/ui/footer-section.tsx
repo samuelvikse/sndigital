@@ -74,10 +74,12 @@ function Footerdemo() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" className="rounded-full border-white/20 bg-transparent text-white/60 hover:border-white/40 hover:text-white hover:bg-white/10">
-                      <Instagram className="h-4 w-4" />
-                      <span className="sr-only">Instagram</span>
-                    </Button>
+                    <a href="https://www.instagram.com/sndigitaleu" target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline" size="icon" className="rounded-full border-white/20 bg-transparent text-white/60 hover:border-white/40 hover:text-white hover:bg-white/10">
+                        <Instagram className="h-4 w-4" />
+                        <span className="sr-only">Instagram</span>
+                      </Button>
+                    </a>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Follow us on Instagram</p>

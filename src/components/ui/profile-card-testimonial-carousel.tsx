@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Linkedin, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+import { Linkedin, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Profile {
@@ -21,15 +21,47 @@ export interface ProfileCarouselProps {
   className?: string;
 }
 
+const AUTO_SWITCH_MS = 6000;
+
+const imageVariants = {
+  enter: { opacity: 0, scale: 1.04 },
+  center: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.98 },
+};
+
+const textVariants = {
+  enter: { opacity: 0, y: 12 },
+  center: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+};
+
+const transition = {
+  duration: 0.8,
+  ease: [0.16, 1, 0.3, 1],
+};
+
 export function ProfileCarousel({ profiles, className }: ProfileCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const handleNext = () =>
-    setCurrentIndex((index) => (index + 1) % profiles.length);
-  const handlePrevious = () =>
-    setCurrentIndex(
-      (index) => (index - 1 + profiles.length) % profiles.length
-    );
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % profiles.length);
+    }, AUTO_SWITCH_MS);
+  }, [profiles.length]);
+
+  useEffect(() => {
+    resetTimer();
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [resetTimer]);
+
+  const handleIndicatorClick = (index: number) => {
+    setCurrentIndex(index);
+    resetTimer();
+  };
 
   const current = profiles[currentIndex];
 
@@ -39,13 +71,14 @@ export function ProfileCarousel({ profiles, className }: ProfileCarouselProps) {
       <div className="hidden md:flex relative items-center">
         {/* Photo */}
         <div className="w-[400px] h-[480px] rounded-sm overflow-hidden bg-[#f5f5f3] flex-shrink-0">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout">
             <motion.div
               key={current.imageUrl}
-              initial={{ opacity: 0, filter: "blur(12px)", scale: 1.02 }}
-              animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
-              exit={{ opacity: 0, filter: "blur(12px)", scale: 1.02 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              variants={imageVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={transition}
               className="w-full h-full"
             >
               <Image
@@ -63,13 +96,14 @@ export function ProfileCarousel({ profiles, className }: ProfileCarouselProps) {
 
         {/* Card */}
         <div className="bg-white rounded-sm shadow-[0_4px_40px_rgba(0,0,0,0.06)] p-10 ml-[-60px] z-10 max-w-md flex-1">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout">
             <motion.div
               key={current.name}
-              initial={{ opacity: 0, filter: "blur(12px)", y: 8 }}
-              animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-              exit={{ opacity: 0, filter: "blur(12px)", y: -4 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              variants={textVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={transition}
             >
               <div className="mb-6">
                 <h2 className="text-xl font-light text-[#231f20] mb-1 tracking-[-0.01em]">
@@ -114,13 +148,14 @@ export function ProfileCarousel({ profiles, className }: ProfileCarouselProps) {
       {/* Mobile layout */}
       <div className="md:hidden max-w-sm mx-auto">
         <div className="w-full aspect-[4/5] bg-[#f5f5f3] rounded-sm overflow-hidden mb-6">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout">
             <motion.div
               key={current.imageUrl}
-              initial={{ opacity: 0, filter: "blur(12px)", scale: 1.02 }}
-              animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
-              exit={{ opacity: 0, filter: "blur(12px)", scale: 1.02 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              variants={imageVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={transition}
               className="w-full h-full"
             >
               <Image
@@ -136,13 +171,14 @@ export function ProfileCarousel({ profiles, className }: ProfileCarouselProps) {
           </AnimatePresence>
         </div>
 
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout">
           <motion.div
             key={current.name}
-            initial={{ opacity: 0, filter: "blur(12px)", y: 8 }}
-            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-            exit={{ opacity: 0, filter: "blur(12px)", y: -4 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            variants={textVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={transition}
           >
             <h2 className="text-lg font-light text-[#231f20] mb-1">
               {current.name}
@@ -179,37 +215,28 @@ export function ProfileCarousel({ profiles, className }: ProfileCarouselProps) {
         </AnimatePresence>
       </div>
 
-      {/* Navigation */}
-      <div className="flex justify-center items-center gap-5 mt-10">
-        <button
-          onClick={handlePrevious}
-          aria-label="Previous"
-          className="group w-10 h-10 border border-[#231f20]/15 rounded-full flex items-center justify-center hover:border-[#231f20]/40 transition-colors cursor-pointer"
-        >
-          <ChevronLeft className="w-4 h-4 text-[#231f20]/50 group-hover:text-[#231f20] transition-colors" />
-        </button>
-
-        <div className="flex gap-2">
-          {profiles.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentIndex(i)}
-              className={cn(
-                "w-1.5 h-1.5 rounded-full transition-colors cursor-pointer",
-                i === currentIndex ? "bg-[#231f20]" : "bg-[#231f20]/15"
-              )}
-              aria-label={`Go to profile ${i + 1}`}
+      {/* Indicator lines */}
+      <div className="flex justify-center items-center gap-2 mt-10">
+        {profiles.map((profile, i) => (
+          <button
+            key={profile.name}
+            type="button"
+            onClick={() => handleIndicatorClick(i)}
+            aria-label={`Show ${profile.name}`}
+            className="relative h-[3px] w-8 rounded-full overflow-hidden cursor-pointer"
+            style={{ backgroundColor: "rgba(35,31,32,0.12)" }}
+          >
+            <span
+              className="absolute inset-0 rounded-full bg-[#231f20] origin-left"
+              style={{
+                transform: i === currentIndex ? "scaleX(1)" : "scaleX(0)",
+                transition: i === currentIndex
+                  ? `transform ${AUTO_SWITCH_MS}ms linear`
+                  : "transform 300ms ease-out",
+              }}
             />
-          ))}
-        </div>
-
-        <button
-          onClick={handleNext}
-          aria-label="Next"
-          className="group w-10 h-10 border border-[#231f20]/15 rounded-full flex items-center justify-center hover:border-[#231f20]/40 transition-colors cursor-pointer"
-        >
-          <ChevronRight className="w-4 h-4 text-[#231f20]/50 group-hover:text-[#231f20] transition-colors" />
-        </button>
+          </button>
+        ))}
       </div>
     </div>
   );
