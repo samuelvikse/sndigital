@@ -1,17 +1,49 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+const people = [
+  { name: "Samuel", image: "/samuel.png" },
+  { name: "Niko", image: "/hero-image.png" },
+];
+
+const AUTO_SWITCH_MS = 5000;
+const TRANSITION_MS = 900;
 
 export default function Hero() {
-  const imageRef = useRef<SVGImageElement>(null);
+  const imageRefA = useRef<SVGImageElement>(null);
+  const imageRefB = useRef<SVGImageElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % people.length);
+    }, AUTO_SWITCH_MS);
+  }, []);
+
+  useEffect(() => {
+    resetTimer();
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [resetTimer]);
+
+  const handleIndicatorClick = (index: number) => {
+    setActiveIndex(index);
+    resetTimer();
+  };
+
+  // Parallax for both images
   useEffect(() => {
     const handleScroll = () => {
-      if (!imageRef.current) return;
       const scrollY = window.scrollY;
       const viewportHeight = window.innerHeight;
-      // Convert scroll to SVG coordinate offset for parallax
       const parallaxOffset = (scrollY / viewportHeight) * 12;
-      imageRef.current.setAttribute("y", String(-15 + parallaxOffset));
+      const y = String(-15 + parallaxOffset);
+      imageRefA.current?.setAttribute("y", y);
+      imageRefB.current?.setAttribute("y", y);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -20,7 +52,7 @@ export default function Hero() {
 
   return (
     <section className="relative w-full h-screen bg-white overflow-hidden">
-      <img src="/logo.svg" alt="SN Digital" className="absolute top-8 left-8 h-8 z-10 animate-text-reveal" style={{ animationDelay: "0.2s" } as React.CSSProperties} />
+      <img src="/logo.svg" alt="SN Digital" className="absolute top-8 left-8 h-8 z-10 animate-text-reveal" style={{ animationDelay: "1.1s" } as React.CSSProperties} />
 
       <div className="relative z-10 flex flex-col justify-center h-full max-w-[540px] pl-8 md:pl-16 lg:pl-24">
         <h1 className="font-sofia text-[clamp(2rem,4vw,3.25rem)] leading-[1.15] font-light tracking-[-0.02em] text-[#231f20]">
@@ -48,7 +80,7 @@ export default function Hero() {
         </h1>
         <p
           className="mt-6 text-[clamp(0.9rem,1.1vw,1.05rem)] leading-[1.6] font-light text-[#231f20]/60 max-w-[440px] animate-text-reveal"
-          style={{ animationDelay: "1.1s" } as React.CSSProperties}
+          style={{ animationDelay: "1.25s" } as React.CSSProperties}
         >
           B2B lead generation for call-based businesses, plus automation and optimization for smaller companies that need better websites, workflows, and follow-up.
         </p>
@@ -63,7 +95,7 @@ export default function Hero() {
           <button
             type="button"
             className="px-6 py-3 text-[#231f20] text-sm font-light tracking-wide border border-[#231f20]/20 rounded-sm hover:border-[#231f20]/50 transition-colors animate-text-reveal"
-            style={{ animationDelay: "1.55s" } as React.CSSProperties}
+            style={{ animationDelay: "1.5s" } as React.CSSProperties}
           >
             Send an Inquiry
           </button>
@@ -71,7 +103,7 @@ export default function Hero() {
 
         <div
           className="flex items-center gap-5 mt-8 animate-text-reveal"
-          style={{ animationDelay: "1.7s" } as React.CSSProperties}
+          style={{ animationDelay: "1.6s" } as React.CSSProperties}
         >
           <a
             href="https://www.instagram.com"
@@ -127,7 +159,7 @@ export default function Hero() {
       <svg
         viewBox="0 0 48.54 48.43"
         className="absolute right-0 top-0 h-full w-auto animate-slide-right"
-        style={{ animationDelay: "0.3s" } as React.CSSProperties}
+        style={{ animationDelay: "1.1s" } as React.CSSProperties}
         aria-hidden="true"
       >
         <defs>
@@ -138,16 +170,60 @@ export default function Hero() {
         </defs>
         <g clipPath="url(#sn-clip)">
           <image
-            ref={imageRef}
-            href="/hero-image.png"
+            ref={imageRefA}
+            href={people[0].image}
             x="-5"
             y="-15"
             width="60"
             height="75"
             preserveAspectRatio="xMidYMid slice"
+            style={{
+              opacity: activeIndex === 0 ? 1 : 0,
+              transition: `opacity ${TRANSITION_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`,
+            }}
+          />
+          <image
+            ref={imageRefB}
+            href={people[1].image}
+            x="-5"
+            y="-15"
+            width="60"
+            height="75"
+            preserveAspectRatio="xMidYMid slice"
+            style={{
+              opacity: activeIndex === 1 ? 1 : 0,
+              transition: `opacity ${TRANSITION_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`,
+            }}
           />
         </g>
       </svg>
+
+      {/* Indicator lines */}
+      <div
+        className="absolute bottom-8 right-8 flex gap-2 z-10 animate-text-reveal"
+        style={{ animationDelay: "1.6s" } as React.CSSProperties}
+      >
+        {people.map((person, i) => (
+          <button
+            key={person.name}
+            type="button"
+            onClick={() => handleIndicatorClick(i)}
+            aria-label={`Show ${person.name}`}
+            className="relative h-[3px] w-8 rounded-full overflow-hidden cursor-pointer"
+            style={{ backgroundColor: "rgba(35,31,32,0.15)" }}
+          >
+            <span
+              className="absolute inset-0 rounded-full bg-[#231f20] origin-left"
+              style={{
+                transform: activeIndex === i ? "scaleX(1)" : "scaleX(0)",
+                transition: activeIndex === i
+                  ? `transform ${AUTO_SWITCH_MS}ms linear`
+                  : "transform 300ms ease-out",
+              }}
+            />
+          </button>
+        ))}
+      </div>
     </section>
   );
 }
