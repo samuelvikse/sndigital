@@ -127,7 +127,7 @@ export default function Hero() {
       <svg
         viewBox="0 0 48.54 48.43"
         className="absolute right-0 top-0 h-full w-auto animate-slide-right"
-        style={{ animationDelay: "0.3s" } as React.CSSProperties}
+        style={{ animationDelay: "0.6s" } as React.CSSProperties}
         aria-hidden="true"
       >
         <defs>
